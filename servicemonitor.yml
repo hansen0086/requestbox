@@ -1,0 +1,14 @@
+apiVersion: monitoring.coreos.com/v1
+# apiVersion: vmservicescrapes.operator.victoriametrics.com
+kind: ServiceMonitor
+metadata:
+  name: requestbox-monitor
+  labels:
+    volcengine.vmp: 'true'
+spec:
+  selector:
+    matchLabels:
+      app: requestbox
+  endpoints:
+    - port: requestbox
+      path: /metrics

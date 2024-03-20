@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: requestbox
+spec:
+  selector:
+    matchLabels:
+      app: requestbox
+  template:
+    metadata:
+      labels:
+        app: requestbox
+    spec:
+      containers:
+      - name: requestbox
+        image: cr-cn-beijing.volces.com/vmp-test/requestbox:latest
+        resources:
+          limits:
+            memory: "30Mi"
+            cpu: "100m"
+        ports:
+        - containerPort: 8080
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: requestbox
+  labels: 
+    app: requestbox
+spec:
+  selector:
+    app: requestbox
+  type: ClusterIP
+  ports:
+  - name: requestbox
+    port: 8080
+    targetPort: 8080
+---
+apiVersion: monitoring.coreos.com/v1
+# apiVersion: vmservicescrapes.operator.victoriametrics.com
+kind: ServiceMonitor
+metadata:
+  name: requestbox-monitor
+  labels:
+    volcengine.vmp: 'true'
+spec:
+  selector:
+    matchLabels:
+      app: requestbox
+  endpoints:
+    - port: requestbox
+      path: /metrics
+
